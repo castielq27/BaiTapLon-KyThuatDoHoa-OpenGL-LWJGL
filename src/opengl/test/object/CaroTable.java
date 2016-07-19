@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import opengl.endgame.Model;
 import opengl.test.Demo;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -45,6 +46,8 @@ public class CaroTable {
     private int viewID;
     private int projectionID;
     
+    
+
         
     public CaroTable(int vao){
         Logger.getGlobal().entering("CaroTable", "CaroTable", vao );
@@ -238,10 +241,20 @@ public class CaroTable {
 
         this.unbind();
     }
-    
+    public void setModelMatrix(Matrix4F m){
+        this.bind();
+        GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
+        this.unbind();
+    }
     public void setViewMatrix(Matrix4F v){
         this.bind();
         GL20.glUniformMatrix4fv(viewID, false, v.toFloatBuffer());
+        this.unbind();
+    }
+    
+    public void setProjectionMatrix(Matrix4F v){
+        this.bind();
+        GL20.glUniformMatrix4fv(this.projectionID, false, v.toFloatBuffer());
         this.unbind();
     }
     

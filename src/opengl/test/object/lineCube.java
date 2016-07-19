@@ -41,14 +41,23 @@ public class lineCube {
     private int x;
     private int y;
     
+    private    float x_calc=0;
+    private    float y_calc=0;
+    private Matrix4F Model;
+    
+    
     public lineCube(int vao,int x, int y){
+        
         if ( vao == 0 )
             throw new IllegalArgumentException("vao == 0 ");
         this.vao = vao;
         this.programID = GL20.glCreateProgram();
         
+        
         this.x = x;
         this.y = y;
+        
+        this.Model = new Matrix4F();
         
         this.vertexShader("opengl/test/object/lineCube.vs");
         this.fragmentShader("opengl/test/object/lineCube.fs");
@@ -183,8 +192,8 @@ public class lineCube {
     public void update(int x, int y){
         this.bind();
 
-        float x_calc=0;
-        float y_calc=0;
+        x_calc=0;
+        y_calc=0;
         if ( x == 0 )
             y_calc = 0.3f;
         if ( x == 1 )
@@ -197,9 +206,8 @@ public class lineCube {
             x_calc = 0f;
         if ( y == 2 )
             x_calc = 0.3f;
-                    
-        Matrix4F m = Matrix4F.ratio(0.3f, 0.3f, 0.3f).nhanMaTran(Matrix4F.move(x_calc, y_calc, 0f));
-
+        
+        Matrix4F m = Matrix4F.ratio(0.3f, 0.3f, 0.3f).nhanMaTran(Matrix4F.move(x_calc, y_calc, 0f)).nhanMaTran(Model);
         GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
         
           
@@ -212,8 +220,8 @@ public class lineCube {
         this.bind();
 
         modelID = GL20.glGetUniformLocation(this.getProgramID(), "model");
-        float x_calc=0;
-        float y_calc=0;
+        x_calc=0;
+        y_calc=0;
         if ( x == 0 )
             y_calc = 0.3f;
         if ( x == 1 )
@@ -227,8 +235,8 @@ public class lineCube {
         if ( y == 2 )
             x_calc = 0.3f;
                     
-        Matrix4F m = Matrix4F.ratio(0.3f, 0.3f, 0.3f).nhanMaTran(Matrix4F.move(x_calc, y_calc, 0f));
-
+        Matrix4F m = Matrix4F.ratio(0.3f, 0.3f, 0.3f).nhanMaTran(Matrix4F.move(x_calc, y_calc, 0f)).nhanMaTran(Model);
+        
         GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
         
         viewID = GL20.glGetUniformLocation(this.getProgramID(), "view");
@@ -248,7 +256,19 @@ public class lineCube {
         GL20.glUniformMatrix4fv(viewID, false, v.toFloatBuffer());
         this.unbind();
     }
-    
+    public void setProjectionMatrix(Matrix4F v){
+        this.bind();
+        GL20.glUniformMatrix4fv(this.projectionID, false, v.toFloatBuffer());
+        this.unbind();
+    }
+
+    public void setModelMatrix(Matrix4F m){
+        this.Model = m.clone();
+
+        //this.bind();
+        //GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
+        //this.unbind();
+    }
     public void render(){
         this.bind();// use porgrma --> ket thuc disable program
         

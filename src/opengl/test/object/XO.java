@@ -50,7 +50,17 @@ public class XO {
     
     private int x;// vi tri tren ban co caro
     private int y;
+    private float x_calc;
+    private float y_calc;
     
+    
+    /**
+     * 
+     * @param vao
+     * @param XO
+     * @param x -- vi tri tren ban co
+     * @param y -- vi tri tren ban co
+     */
     public XO(int vao,int XO, int x, int y ){
         Logger.getGlobal().entering("tugiac", "tugiac", new Object[]{vao,XO} );
 
@@ -72,6 +82,33 @@ public class XO {
         this.initVertex();
         this.initUniformValues();
     }
+    /**
+     * 
+     * @param vao
+     * @param XO 
+     */
+    public XO(int vao,int XO ){
+        Logger.getGlobal().entering("tugiac", "tugiac", new Object[]{vao,XO} );
+
+        if ( XO != Caro.X && XO != Caro.O )
+            throw new IllegalArgumentException("XO != Caro.X && XO != Caro.Y");
+        if ( vao == 0 )
+            throw new IllegalArgumentException("init : paramaters is null ");
+
+        this.x = -1;
+        this.y = -1;
+        
+        this.vao = vao;
+        this.value = XO;
+        
+        this.programID = GL20.glCreateProgram();
+        this.vertexShader("opengl/test/object/XO.vs");
+        this.fragmentShader("opengl/test/object/XO.fs");
+        this.link();
+        this.initVertex();
+        this.initUniformValues();
+    }
+    
     
     private void vertexShader(String file){
         this.vertexID = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
@@ -132,7 +169,6 @@ public class XO {
         
         // delete vao
         GL30.glBindVertexArray(0);
-        GL30.glDeleteVertexArrays(this.vao);
         // delete vbo
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL15.glDeleteBuffers(this.vbo);
@@ -221,28 +257,34 @@ public class XO {
                                              // size = 3 --> vec3
 
     }
-
+    
     private void initUniformValues(){
         this.bind();
+        if ( x != -1 && y != -1 ){
+            modelID = GL20.glGetUniformLocation(this.getProgramID(), "model");
+            x_calc=0;
+            y_calc=0;
+            if ( x == 0 )
+                y_calc = 0.3f;
+            if ( x == 1 )
+                y_calc = 0;
+            if ( x == 2 )
+                y_calc = -0.3f;
+            if ( y == 0 )
+                x_calc = -0.3f;
+            if ( y == 1 )
+                x_calc = 0f;
+            if ( y == 2 )
+                x_calc = 0.3f;
 
-        modelID = GL20.glGetUniformLocation(this.getProgramID(), "model");
-        float x_calc=0;
-        float y_calc=0;
-        if ( x == 0 )
-            y_calc = 0.3f;
-        if ( x == 1 )
-            y_calc = 0;
-        if ( x == 2 )
-            y_calc = -0.3f;
-        if ( y == 0 )
-            x_calc = -0.3f;
-        if ( y == 1 )
-            x_calc = 0f;
-        if ( y == 2 )
-            x_calc = 0.3f;
-                    
-        Matrix4F m = Matrix4F.ratio(0.10f, 0.10f, 0.10f).nhanMaTran(Matrix4F.rotateOX(90)).nhanMaTran(Matrix4F.move(x_calc, y_calc, -0.0125f));
-        GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
+            Matrix4F m = Matrix4F.ratio(0.10f, 0.10f, 0.10f).nhanMaTran(Matrix4F.rotateOX(90)).nhanMaTran(Matrix4F.move(x_calc, y_calc, -0.0005f));
+            GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
+        } else {
+            modelID = GL20.glGetUniformLocation(this.getProgramID(), "model");
+            Matrix4F m = new Matrix4F();
+            GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());            
+        }
+
         
         viewID = GL20.glGetUniformLocation(this.getProgramID(), "view");
         Matrix4F v = new Matrix4F();
@@ -257,12 +299,23 @@ public class XO {
         this.unbind();
     }
     
+    public void setModelMatrix(Matrix4F m){
+        this.bind();
+        Matrix4F m2 = Matrix4F.ratio(0.10f, 0.10f, 0.10f).nhanMaTran(Matrix4F.rotateOX(90)).nhanMaTran(Matrix4F.move(x_calc, y_calc, -0.0005f)).nhanMaTran(m);
+        GL20.glUniformMatrix4fv(modelID, false, m2.toFloatBuffer());
+        this.unbind();
+    }
+    
     public void setViewMatrix(Matrix4F v){
         this.bind();
         GL20.glUniformMatrix4fv(viewID, false, v.toFloatBuffer());
         this.unbind();
     }
-    
+    public void setProjectionMatrix(Matrix4F v){
+        this.bind();
+        GL20.glUniformMatrix4fv(this.projectionID, false, v.toFloatBuffer());
+        this.unbind();
+    }
     public void render(){
         
         this.bind();// use porgrma --> ket thuc disable program

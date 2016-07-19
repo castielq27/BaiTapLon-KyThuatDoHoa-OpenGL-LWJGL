@@ -26,9 +26,9 @@ import org.lwjgl.system.MemoryUtil;
 
 public class OpenGL {
     
-    protected int width = 600;
-    protected int height = 800;
-    protected String title = "Test";
+    protected int width = 800;
+    protected int height = 600;
+    protected String title = "GAME CARO";
     
     
     private GLFWErrorCallback errorCallback = GLFWErrorCallback.createPrint(System.err);

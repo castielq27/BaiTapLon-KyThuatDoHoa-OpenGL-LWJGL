@@ -101,8 +101,7 @@ public class Matrix4F {
                 result.matrix[i][j] += this.matrix[i][k]*o.matrix[k][j];
             }            
         }
-        this.matrix = result.matrix;
-        return this;
+        return result;
     }
     
     public static Matrix4F PROJECTION(float left, float right, float bottom, float top, float zNear, float zFar){
@@ -110,9 +109,9 @@ public class Matrix4F {
         result.matrix[0][0] = 2/(right-left);
         result.matrix[1][1] = 2/(top-bottom);
         result.matrix[2][2] = -2/(zFar-zNear);
-        result.matrix[0][3] = (right+left)/(right-left);
-        result.matrix[1][3] = (top+bottom)/(top-bottom);
-        result.matrix[2][3] = (zFar+zNear)/(zFar-zNear);
+        result.matrix[0][3] = -(right+left)/(right-left);
+        result.matrix[1][3] = -(top+bottom)/(top-bottom);
+        result.matrix[2][3] = -(zFar+zNear)/(zFar-zNear);
         return result;
     }
     
@@ -121,5 +120,13 @@ public class Matrix4F {
                     matrix[1][0] + " " + matrix[1][1] + " " + matrix[1][2] + " " + matrix[1][3] + "\n" +
                             matrix[2][0] + " " + matrix[2][1] + " " + matrix[2][2] + " " + matrix[2][3] + "\n" +
                                     matrix[3][0] + " " + matrix[3][1] + " " + matrix[3][2] + " " + matrix[3][3];
+    }
+    
+    public Matrix4F clone(){
+        Matrix4F r = new Matrix4F();
+        for ( int i = 0; i<4; i++ )
+            for ( int j = 0; j<4; j++ )
+                r.matrix[i][j] = this.matrix[i][j];
+        return r;
     }
 }
