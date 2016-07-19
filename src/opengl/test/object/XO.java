@@ -131,7 +131,7 @@ public class XO {
         
     }
     private static String sourceLoader(String file){
-        Scanner in = new Scanner( tamgiac.class.getClassLoader().getResourceAsStream(file));
+        Scanner in = new Scanner( XO.class.getClassLoader().getResourceAsStream(file));
         StringBuilder source = new StringBuilder("");
         while( in.hasNextLine() ){
             source.append(in.nextLine() + "\n");
