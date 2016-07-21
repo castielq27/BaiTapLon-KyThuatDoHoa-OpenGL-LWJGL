@@ -17,16 +17,11 @@ import java.util.logging.Logger;
 import opengl.test.object.endgame.endgame;
 import opengl.test.object.CaroTable;
 import opengl.test.object.GioiThieu;
-import opengl.test.object.Wallpaper;
 import opengl.test.object.XO;
 import opengl.test.object.cube.cube;
 import opengl.test.object.lineCube;
 import opengl.test.object.table.table;
 import opengl.test.object.tivi.tivi;
-import opengl.test.object.tree.traicay;
-import opengl.test.object.tree.leaf;
-import opengl.test.object.tree.tree;
-import opengl.test.object.tree.trunk;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -231,6 +226,9 @@ public class Demo extends OpenGL {
        this.table.deleteProgram();
        this.tivi.deleteProgram();
        
+       
+       GL30.glBindVertexArray(0);
+       GL30.glDeleteVertexArrays(this.vao);
 
     }
     

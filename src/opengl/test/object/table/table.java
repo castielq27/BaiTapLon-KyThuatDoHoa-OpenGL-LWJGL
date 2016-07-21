@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import Utils.objLoad;
 import java.io.FileNotFoundException;
 import opengl.test.Caro;
+import opengl.test.object.object;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -27,133 +28,41 @@ import org.lwjgl.stb.STBImage;
  *
  * @author castiel
  */
-public class table {
+public class table extends object {
 
-
-    private int programID;
-    private int vertexID;
-    private int fragmentID;
-    
-    private int vao;
-    private int vbo;
-    
-    private FloatBuffer VertexColorTexCoordBuffer;
     private int size = 0;
     
-    private int modelID;
-    private int viewID;
-    private int projectionID;
-    
-    private int textureID;
-
-   
     /**
      * 
      * @param vao
      * @param XO 
      */
     public table(int vao ){
-        Logger.getGlobal().entering("tugiac", "tugiac", new Object[]{vao} );
-
         if ( vao == 0 )
-            throw new IllegalArgumentException("init : paramaters is null ");
-
-        
+            throw new RuntimeException("init : paramaters is null ");
         this.vao = vao;
-
         
         this.programID = GL20.glCreateProgram();
-        this.vertexShader("opengl/test/object/table/table.vs");
-        this.fragmentShader("opengl/test/object/table/table.fs");
+        this.vertexShader("opengl/test/object/object.vs");
+        this.fragmentShader("opengl/test/object/object.fs");
         this.link();
         this.initVertex();
         this.initUniformValues();
     }
-    
-    
-    private void vertexShader(String file){
-        this.vertexID = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
-        GL20.glShaderSource(this.vertexID, table.sourceLoader(file));
-        GL20.glCompileShader(this.vertexID);
-        if ( GL20.glGetShaderi(this.vertexID, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE ){
-            throw new RuntimeException("Khong the compile vertexShader");
-        }
-        GL20.glAttachShader(this.programID, this.vertexID);
-    }
-
-    private void fragmentShader(String file){
-        this.fragmentID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
-        GL20.glShaderSource(this.fragmentID, table.sourceLoader(file));
-        GL20.glCompileShader(this.fragmentID);
-        if ( GL20.glGetShaderi(this.fragmentID, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE ){
-            throw new RuntimeException("Khong the compile fragmentShader");
-        }
-        GL20.glAttachShader(this.programID, this.fragmentID);        
         
-    }
-    private static String sourceLoader(String file){
-        Scanner in = new Scanner( table.class.getClassLoader().getResourceAsStream(file));
-        StringBuilder source = new StringBuilder("");
-        while( in.hasNextLine() ){
-            source.append(in.nextLine() + "\n");
-        }
-        return source.toString();
-    }
-    
-    private void link(){
-        GL20.glLinkProgram(programID);
-        if ( GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) != GL11.GL_TRUE ){
-            throw new RuntimeException("Khong the link program");
-        }
-    }
-    
-    public void bind(){
-        GL20.glUseProgram(programID);
-    }
-    
-    public void unbind(){
-        GL20.glUseProgram(0);
-    }
-    
-    public void deleteProgram(){
-        // disable program
-        this.unbind();
-        
-        // detach shader
-        GL20.glDetachShader(this.programID, this.vertexID);
-        GL20.glDetachShader(this.programID, this.fragmentID);
-        // delete shader
-        GL20.glDeleteShader(this.vertexID);
-        GL20.glDeleteShader(this.fragmentID);
-        GL20.glDeleteProgram(this.programID);
-        
-        
-        // delete vao
-        GL30.glBindVertexArray(0);
-        // delete vbo
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glDeleteBuffers(this.vbo);
-       
-        
-    }
-    public int getProgramID(){
-        return this.programID;
-    }
-    
-    private void initVertex(){
+    @Override
+    protected void initVertex(){
         GL30.glBindVertexArray(vao);//bind vao  
         
         Object[] dataInput = objLoad.Wavefront(table.class.getClassLoader().getResourceAsStream("opengl/test/object/table/table.obj"), 1.0f, 1.0f, 1.0f);
-        this.VertexColorTexCoordBuffer = (FloatBuffer)dataInput[0];
+        super.dataBuffer = (FloatBuffer)dataInput[0];
         this.size = (int)dataInput[1];
         
         this.vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo); 
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.VertexColorTexCoordBuffer, GL15.GL_STATIC_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, super.dataBuffer, GL15.GL_STATIC_DRAW);
         
         this.VertexAttribPointer();
-
-
         
         IntBuffer w = BufferUtils.createIntBuffer(1);
         IntBuffer h = BufferUtils.createIntBuffer(1);
@@ -184,7 +93,8 @@ public class table {
      * Method nay duoc tach rieng ra tu initVertex 
      * Vi render nhieu doi tuong neu dung Multi vbo --> truoc khi draw phai bind lai vbo --> moi lan bind lai se phai set lai VertexAttribPointer
      */
-    private void VertexAttribPointer(){
+    @Override
+    protected void VertexAttribPointer(){
         if ( this.vbo == 0 )
             throw new RuntimeException("Chua khoi tao VBO");
         
@@ -205,7 +115,8 @@ public class table {
 
     }
     
-    private void initUniformValues(){
+    @Override
+    protected void initUniformValues(){
         this.bind();
       
         modelID = GL20.glGetUniformLocation(this.getProgramID(), "model");
@@ -225,22 +136,7 @@ public class table {
         this.unbind();
     }
     
-    public void setModelMatrix(Matrix4F m){
-        this.bind();
-        GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
-        this.unbind();
-    }
-    
-    public void setViewMatrix(Matrix4F v){
-        this.bind();
-        GL20.glUniformMatrix4fv(viewID, false, v.toFloatBuffer());
-        this.unbind();
-    }
-    public void setProjectionMatrix(Matrix4F v){
-        this.bind();
-        GL20.glUniformMatrix4fv(this.projectionID, false, v.toFloatBuffer());
-        this.unbind();
-    }
+    @Override
     public void render(){
         
         this.bind();// use porgrma --> ket thuc disable program
@@ -263,21 +159,6 @@ public class table {
         this.unbind();// dsiable program
     }
 
-    public int getModelID() {
-        return modelID;
-    }
-
-    public int getViewID() {
-        return viewID;
-    }
-
-    public int getProjectionID() {
-        return projectionID;
-    }
-    
-    
-    
-    
 
 }
     

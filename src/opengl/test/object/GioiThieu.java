@@ -11,11 +11,13 @@ import opengl.test.Caro;
 /**
  *
  * @author castiel
+ * mulitple objects
+ * 
  */
 public class GioiThieu {
-    private image image;
-    private XO x;
-    private XO o;
+    private image image;// anh gioi thieu
+    private XO x;  // X object rotate
+    private XO o; // O object
     private int vao;
     
     private Matrix4F Model = new Matrix4F();

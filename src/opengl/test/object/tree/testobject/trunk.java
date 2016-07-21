@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package opengl.test.object.tree;
+package opengl.test.object.tree.testobject;
 
 import Utils.objLoad;
 import Utils.Matrix4F;
@@ -27,7 +27,7 @@ import org.lwjgl.stb.STBImage;
  *
  * @author castiel
  */
-public class leaf {
+public class trunk {
 
 
     private int programID;
@@ -53,7 +53,7 @@ public class leaf {
      * @param vao
      * @param XO 
      */
-    public leaf(int vao ){
+    public trunk(int vao ){
         Logger.getGlobal().entering("tugiac", "tugiac", new Object[]{vao} );
 
         if ( vao == 0 )
@@ -74,7 +74,7 @@ public class leaf {
     
     private void vertexShader(String file){
         this.vertexID = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
-        GL20.glShaderSource(this.vertexID, leaf.sourceLoader(file));
+        GL20.glShaderSource(this.vertexID, trunk.sourceLoader(file));
         GL20.glCompileShader(this.vertexID);
         if ( GL20.glGetShaderi(this.vertexID, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE ){
             throw new RuntimeException("Khong the compile vertexShader");
@@ -84,7 +84,7 @@ public class leaf {
 
     private void fragmentShader(String file){
         this.fragmentID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
-        GL20.glShaderSource(this.fragmentID, leaf.sourceLoader(file));
+        GL20.glShaderSource(this.fragmentID, trunk.sourceLoader(file));
         GL20.glCompileShader(this.fragmentID);
         if ( GL20.glGetShaderi(this.fragmentID, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE ){
             throw new RuntimeException("Khong the compile fragmentShader");
@@ -93,7 +93,7 @@ public class leaf {
         
     }
     private static String sourceLoader(String file){
-        Scanner in = new Scanner( leaf.class.getClassLoader().getResourceAsStream(file));
+        Scanner in = new Scanner( trunk.class.getClassLoader().getResourceAsStream(file));
         StringBuilder source = new StringBuilder("");
         while( in.hasNextLine() ){
             source.append(in.nextLine() + "\n");
@@ -148,7 +148,7 @@ public class leaf {
         GL30.glBindVertexArray(vao);//bind vao  
         
         
-        this.VertexColorBuffer = objLoad.VertexColorLoad(leaf.class.getClassLoader().getResourceAsStream("opengl/test/object/tree/leaf.obj"));
+        this.VertexColorBuffer = objLoad.VertexColorLoad(trunk.class.getClassLoader().getResourceAsStream("opengl/test/object/tree/trunk.obj"));
         
         Logger.getGlobal().log(Level.SEVERE, "FloatBuffer capacity  : " + VertexColorBuffer.capacity() );
 
@@ -158,7 +158,7 @@ public class leaf {
         
         this.VertexAttribPointer();
 
-        this.indices = objLoad.indicesLoad(leaf.class.getClassLoader().getResourceAsStream("opengl/test/object/tree/leaf.obj"));
+        this.indices = objLoad.indicesLoad(trunk.class.getClassLoader().getResourceAsStream("opengl/test/object/tree/trunk.obj"));
         
         this.ebo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.ebo);

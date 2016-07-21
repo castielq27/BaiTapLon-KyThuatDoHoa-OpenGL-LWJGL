@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package opengl.test.object.tree;
+package opengl.test.object.tree.testobject;
 
 import Utils.Matrix4F;
 

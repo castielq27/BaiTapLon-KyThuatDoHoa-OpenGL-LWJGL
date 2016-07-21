@@ -29,28 +29,13 @@ import org.lwjgl.stb.STBImage;
  *
  * @author castiel
  */
-public class image {
-    private int programID;
-    private int vertexID;
-    private int fragmentID;
-    
-    private int vao;
-    private int vbo;
-    private int ebo;
-    
-    private int textureID;
-    private FloatBuffer dataBuffer;
-    
-    private int modelID;
-    private int viewID;
-    private int projectionID;
+public class image extends object {
     
     private float x;
     private float y;
     private float z;
     private String link;
     
-        
     public image(int vao, float sizeX, float sizeY, float depth, String linkimage){
         Logger.getGlobal().entering("image", "image", new Object[]{vao,sizeX,sizeY,depth,linkimage} );
         if ( vao == 0 )
@@ -63,87 +48,15 @@ public class image {
         this.z = depth;
         
         this.programID = GL20.glCreateProgram();
-        this.vertexShader("opengl/test/object/image.vs");
-        this.fragmentShader("opengl/test/object/image.fs");
+        this.vertexShader("opengl/test/object/object.vs");
+        this.fragmentShader("opengl/test/object/object.fs");
         this.link();
         this.initVertex();
         this.initUniformValues();
     }
     
-    private void vertexShader(String file){
-        this.vertexID = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
-        GL20.glShaderSource(this.vertexID, image.sourceLoader(file));
-        GL20.glCompileShader(this.vertexID);
-        if ( GL20.glGetShaderi(this.vertexID, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE ){
-            throw new RuntimeException("Khong the compile vertexShader");
-        }
-        GL20.glAttachShader(this.programID, this.vertexID);
-    }
-
-    private void fragmentShader(String file){
-        this.fragmentID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
-        GL20.glShaderSource(this.fragmentID, image.sourceLoader(file));
-        GL20.glCompileShader(this.fragmentID);
-        if ( GL20.glGetShaderi(this.fragmentID, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE ){
-            throw new RuntimeException("Khong the compile fragmentShader");
-        }
-        GL20.glAttachShader(this.programID, this.fragmentID);        
-        
-    }
-    private static String sourceLoader(String file){
-        Scanner in = new Scanner( XO.class.getClassLoader().getResourceAsStream(file));
-        StringBuilder source = new StringBuilder("");
-        while( in.hasNextLine() ){
-            source.append(in.nextLine() + "\n");
-        }
-        return source.toString();
-    }
-    
-    private void link(){
-        GL20.glLinkProgram(programID);
-        if ( GL20.glGetProgrami(programID, GL20.GL_LINK_STATUS) != GL11.GL_TRUE ){
-            throw new RuntimeException("Khong the link program");
-        }
-    }
-    
-    public void bind(){
-        GL20.glUseProgram(programID);
-    }
-    
-    public void unbind(){
-        GL20.glUseProgram(0);
-    }
-    
-    public void deleteProgram(){
-        // disable program
-        this.unbind();
-        
-        // detach shader
-        GL20.glDetachShader(this.programID, this.vertexID);
-        GL20.glDetachShader(this.programID, this.fragmentID);
-        // delete shader
-        GL20.glDeleteShader(this.vertexID);
-        GL20.glDeleteShader(this.fragmentID);
-        GL20.glDeleteProgram(this.programID);
-        
-        
-        // delete vao
-        GL30.glBindVertexArray(0);
-        GL30.glDeleteVertexArrays(this.vao);
-        // delete vbo
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glDeleteBuffers(this.vbo);
-       
-        //delete vbo
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL15.glDeleteBuffers(this.ebo);
-        
-    }
-    public int getProgramID(){
-        return this.programID;
-    }
-    
-    private void initVertex(){
+    @Override
+    protected void initVertex(){
         GL30.glBindVertexArray(vao);//bind vao  
         
                                     // position        color       texCoord
@@ -206,7 +119,8 @@ public class image {
      * Method nay duoc tach rieng ra tu initVertex 
      * Vi render nhieu doi tuong neu dung Multi vbo --> truoc khi draw phai bind lai vbo --> moi lan bind lai se phai set lai VertexAttribPointer
      */
-    private void VertexAttribPointer(){
+    @Override
+    protected void VertexAttribPointer(){
         if ( this.vbo == 0 )
             throw new RuntimeException("Chua khoi tao VBO");
         
@@ -226,7 +140,8 @@ public class image {
                                             // size = 2 --> vec2
     }
 
-    private void initUniformValues(){
+    @Override
+    protected void initUniformValues(){
         this.bind();
 
         modelID = GL20.glGetUniformLocation(this.getProgramID(), "model");
@@ -248,24 +163,7 @@ public class image {
         this.unbind();
     }
     
-    public void setModelMatrix(Matrix4F m){
-        this.bind();
-        GL20.glUniformMatrix4fv(modelID, false, m.toFloatBuffer());
-        this.unbind();
-    }
-    
-    public void setViewMatrix(Matrix4F v){
-        this.bind();
-        GL20.glUniformMatrix4fv(viewID, false, v.toFloatBuffer());
-        this.unbind();
-    }
-
-    public void setProjectionMatrix(Matrix4F p){
-        this.bind();
-        GL20.glUniformMatrix4fv(this.projectionID, false, p.toFloatBuffer());
-        this.unbind();
-    }
-    
+    @Override
     public void render(){
         
         this.bind();// use porgrma --> ket thuc disable program
@@ -288,20 +186,5 @@ public class image {
         this.unbind();// dsiable program
     }
 
-    public int getModelID() {
-        return modelID;
-    }
-
-    public int getViewID() {
-        return viewID;
-    }
-
-    public int getProjectionID() {
-        return projectionID;
-    }
-    
-    
-    
-    
 
 }
